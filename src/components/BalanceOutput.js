@@ -78,7 +78,34 @@ BalanceOutput.propTypes = {
 export default connect(state => {
   let balance = [];
 
-  /* YOUR CODE GOES HERE */
+  const { startAccount, endAccount, startPeriod, endPeriod } = state.userInput;
+
+  const filteredEntries = state.journalEntries.filter(entry => {
+    const accountInRange = (startAccount ? entry.ACCOUNT >= startAccount : true) &&
+                           (endAccount ? entry.ACCOUNT <= endAccount : true);
+    const periodInRange = (startPeriod ? entry.PERIOD >= startPeriod : true) &&
+                          (endPeriod ? entry.PERIOD <= endPeriod : true);
+    return accountInRange && periodInRange;
+  });
+
+  const groupedByAccount = filteredEntries.reduce((acc, entry) => {
+    if (!acc[entry.ACCOUNT]) {
+      acc[entry.ACCOUNT] = {
+        ACCOUNT: entry.ACCOUNT,
+        DESCRIPTION: entry.DESCRIPTION,
+        DEBIT: 0,
+        CREDIT: 0
+      };
+    }
+    acc[entry.ACCOUNT].DEBIT += entry.DEBIT;
+    acc[entry.ACCOUNT].CREDIT += entry.CREDIT;
+    return acc;
+  }, {});
+
+  balance = Object.values(groupedByAccount).map(account => ({
+    ...account,
+    BALANCE: account.DEBIT - account.CREDIT
+  }));
 
   const totalCredit = balance.reduce((acc, entry) => acc + entry.CREDIT, 0);
   const totalDebit = balance.reduce((acc, entry) => acc + entry.DEBIT, 0);
