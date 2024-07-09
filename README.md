@@ -1,44 +1,77 @@
-# Coding Challenge
+# Accounting Journal Balance Calculator
 
-Your task is to finish the Redux `mapStateToProps` function to a program to help an accountant to get balances from accounting journals.
+This project helps accountants get balances from accounting journals based on specific user inputs. It includes a form for inputting accounts, journal entries, and user parameters, as well as a display component to show the calculated balances.
 
-## Getting started
+## Components
 
-Install modules by running `npm install` in the command line, then `npm run start`.
+### InputForm Component
 
-## Inputs & Outputs
+The `InputForm` component allows the user to input account data, journal entries, and user-specific parameters. The state is managed within the component and the data is dispatched to the Redux store upon form submission.
 
-Journal and Accounts input fields are already parsed and stored in the app's
-Redux store.
+#### Key Features:
+- Captures user input for accounts, journal entries, and parameters.
+- Dispatches actions to set accounts, journal entries, and user input in the Redux store.
+- Automatically submits the form on component mount for initial data processing.
 
-User input has the following form:
+### BalanceOutput Component
 
-    AAAA BBBB CCC-YY DDD-YY EEE
+The `BalanceOutput` component displays the calculated balance data based on the user input. It filters and processes the journal entries and accounts to calculate the debit, credit, and balance for each account.
 
-- AAAA is the starting account (* means first account of source file)
-- BBBB is the ending account(* means last account of source file)
-- CCC-YY is the first period (* means first period of source file)
-- DDD-YY is the last period (* means last period of source file)
-- EEE is output format (values can be HTML or CSV).
+#### Key Features:
+- Connects to the Redux store to access user input, journal entries, and accounts.
+- Filters journal entries based on account range and period specified by the user.
+- Groups entries by account and calculates the total debit, credit, and balance.
+- Displays the results in either HTML table or CSV format, based on user preference.
 
-Examples of user inputs:
+## Redux Integration
 
-    1000 5000 MAR-16 JUL-16 HTML
+### Actions
 
-This user request must output all accounts from acounts starting with "1000" to accounts starting with "5000", from period MAR-16 to JUL-16. Output should be formatted as an HTML table.
+Three actions are defined to manage the state of accounts, journal entries, and user input:
+- `SET_ACCOUNTS`: Sets the account data.
+- `SET_JOURNAL_ENTRIES`: Sets the journal entries.
+- `SET_USER_INPUT`: Sets the user input parameters.
 
-![1000 5000 MAR-16 JUL-16 HTML](/example-1.png)
+### Reducers
 
-    2000 * * MAY-16 CSV
+A reducer for `userInput` is implemented to handle the `SET_USER_INPUT` action and update the state with the user-provided parameters.
 
-This user request must output all accounts from accounts starting with "2000" to last account from source file, from first period of file to MAY-16. Output should be formatted as CSV.
+### Utilities
 
-![2000 * * MAY-16 CSV](/example-2.png)
+Helper functions are provided to parse CSV data, convert dates, and process user input strings:
+- `parseCSV`: Parses CSV strings into objects.
+- `stringToDate` and `dateToString`: Convert date strings to Date objects and vice versa.
+- `parseUserInput`: Parses the user input string into an object with specific parameters.
 
-## Challenge
+## Implementation Details
 
-Parsing input fields and storing in Redux has already been implemented; it's up to you to filter the journals and accounts to create the balance data set. This code should go into the selector function at the bottom of the BalanceOutput component. The BalanceOutput component expects balance to be an array of objects with the keys: ACCOUNT, DESCRIPTION, DEBIT, CREDIT, and BALANCE.
+### Filtering and Calculating Balance
 
-## Post challenge
+The main logic for filtering journal entries and calculating balances is implemented in the `mapStateToProps` function of the `BalanceOutput` component:
 
-After you're done, commit your changes, push to your GitHub and send us a link.
+1. **Extract User Input**: Extracts the account range and period range from the user input stored in the Redux state.
+
+2. **Filter Journal Entries**: Filters the journal entries based on the specified account range and period range.
+
+3. **Group by Account**: Groups the filtered entries by account number and sums the debit and credit amounts for each account.
+
+4. **Calculate Balance**: Calculates the balance for each account as the difference between total debit and credit.
+
+5. **Calculate Totals**: Calculates the total debit and total credit across all accounts.
+
+This logic ensures that the balance data is accurately calculated and formatted based on the user's specifications.
+
+## Usage
+
+1. **Input Data**: Enter account data, journal entries, and user parameters in the form.
+2. **Submit Form**: The form is automatically submitted on component mount, or can be manually submitted to process the data.
+3. **View Results**: The calculated balances are displayed in the desired format (HTML table or CSV) based on the user input.
+
+## Example User Inputs
+
+- `1000 5000 MAR-16 JUL-16 HTML`: Outputs all accounts from 1000 to 5000 for the period March 2016 to July 2016, formatted as an HTML table.
+- `2000 * * MAY-16 CSV`: Outputs all accounts from 2000 onwards up to May 2016, formatted as CSV.
+
+## Conclusion
+
+This project demonstrates how to capture user input, process and filter data, and calculate and display results using React and Redux. The implementation provides a flexible and user-friendly way for accountants to obtain balance data from accounting journals.
